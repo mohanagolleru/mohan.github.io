@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mohan | Art</title>
+
+  <style>
+    :root{
+      --max: 1180px;
+      --gap: 28px;
+      --line: #d7d7d7;
+      --ink: #111;
+      --blue: #1f5eff;
+      --bg: #fff;
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image:
+        repeating-radial-gradient(circle at 25% 20%,
+          rgba(0,0,0,0.35) 0 1px,
+          transparent 1px 16px);
+      z-index: -1;
+    }
+
+    .wrap{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      position: relative;
+    }
+
+    .sidenav{
+      position: fixed;
+      top: 90px;
+      right: 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: right;
+      letter-spacing: 2px;
+      font-weight: 800;
+      z-index: 10;
+    }
+    .sidenav a{
+      text-decoration: none;
+      color: var(--ink);
+      font-size: 18px;
+    }
+    .sidenav a.active,
+    .sidenav a:hover{
+      color: var(--blue);
+    }
+
+    header{
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .name{
+      font-weight: 800;
+      letter-spacing: 1px;
+      font-size: 18px;
+    }
+
+    .tagline{
+      margin: 0 0 26px 0;
+      max-width: 720px;
+      line-height: 1.45;
+    }
+
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--gap);
+      align-items: start;
+    }
+
+    .card{
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    .card img{
+      display: block;
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+    }
+
+    @media (min-width: 1100px){
+      .wrap{ padding-right: 140px; }
+    }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: repeat(2, 1fr); }
+      .sidenav{
+        right: 16px;
+        top: 16px;
+        background: rgba(255,255,255,0.92);
+        border: 1px solid var(--line);
+        padding: 12px;
+      }
+      .sidenav a{ font-size: 16px; }
+    }
+
+    @media (max-width: 620px){
+      .grid{ grid-template-columns: 1fr; }
+      .card img{ height: 340px; }
+      header{ flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="sidenav" aria-label="Site">
+    <a href="index.html">HOME</a>
+    <a class="active" href="art.html">ART</a>
+  </nav>
+
+  <div class="wrap">
+    <header>
+      <div class="name">Mohan Golleru</div>
+    </header>
+
+    <p class="tagline">
+      Art
+    </p>
+
+    <div class="grid">
+      <div class="card"><img src="1.png" alt="Artwork 1" loading="lazy"></div>
+      <div class="card"><img src="2.png" alt="Artwork 2" loading="lazy"></div>
+      <div class="card"><img src="3.png" alt="Artwork 3" loading="lazy"></div>
+      <div class="card"><img src="4.png" alt="Artwork 4" loading="lazy"></div>
+      <div class="card"><img src="5.png" alt="Artwork 5" loading="lazy"></div>
+      <div class="card"><img src="6.jpg" alt="Artwork 6" loading="lazy"></div>
+      <div class="card"><img src="7.jpg" alt="Artwork 7" loading="lazy"></div>
+      <div class="card"><img src="8.jpg" alt="Artwork 8" loading="lazy"></div>
+      <div class="card"><img src="9.jpg" alt="Artwork 9" loading="lazy"></div>
+    </div>
+  </div>
+</body>
+</html>
