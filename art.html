@@ -3,156 +3,527 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mohan | Art</title>
-
+  <title>Art — Mohan Golleru</title>
+  <meta name="description" content="Art by Mohan Golleru." />
+  <meta name="robots" content="noimageindex" />
+  <meta property="og:title" content="Art — Mohan Golleru" />
+  <meta property="og:description" content="Art by Mohan Golleru." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --max: 1180px;
-      --gap: 28px;
-      --line: #d7d7d7;
-      --ink: #111;
-      --blue: #1f5eff;
-      --bg: #fff;
+    :root {
+      --bg: #FAFAF8;
+      --ink: #1A1A1A;
+      --muted: #6B6B6B;
+      --line: #E5E5E5;
+      --surface: #FFFFFF;
+      --font-heading: 'Space Grotesk', system-ui, sans-serif;
+      --font-body: 'Inter', system-ui, sans-serif;
     }
 
-    *{ box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none; }
+    html { font-size: 16px; scroll-behavior: smooth; }
 
-    body{
-      margin: 0;
-      font-family: Arial, sans-serif;
+    body {
+      font-family: var(--font-body);
       color: var(--ink);
       background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
+    body.loaded { opacity: 1; }
+    body.fading { opacity: 0; }
 
-    body::before{
-      content:"";
+    /* ─── Grain Texture ─── */
+    .grain {
       position: fixed;
-      inset: 0;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      z-index: 1;
       pointer-events: none;
-      opacity: 0.18;
-      background-image:
-        repeating-radial-gradient(circle at 25% 20%,
-          rgba(0,0,0,0.35) 0 1px,
-          transparent 1px 16px);
-      z-index: -1;
+      opacity: 0.035;
     }
 
-    .wrap{
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 40px 24px 80px;
-      position: relative;
-    }
-
-    .sidenav{
+    /* ─── Topographic Background ─── */
+    #topo {
       position: fixed;
-      top: 90px;
-      right: 44px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ─── Navigation ─── */
+    .nav {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+      padding: 32px 40px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      text-align: right;
-      letter-spacing: 2px;
-      font-weight: 800;
-      z-index: 10;
+      align-items: flex-end;
+      gap: 12px;
     }
-    .sidenav a{
+    .nav a {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       text-decoration: none;
+      color: var(--muted);
+      transition: color 0.2s ease;
+    }
+    .nav a.active { color: var(--ink); }
+    .nav a:hover  { color: var(--ink); }
+
+    /* ─── Page Content ─── */
+    .page {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 10vw 80px;
+    }
+
+    .page-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: clamp(2.25rem, 4vw, 3.5rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
       color: var(--ink);
-      font-size: 18px;
+      margin-bottom: 8px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
     }
-    .sidenav a.active,
-    .sidenav a:hover{
-      color: var(--blue);
-    }
-
-    header{
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-    .name{
-      font-weight: 800;
-      letter-spacing: 1px;
-      font-size: 18px;
+    .page-subtitle {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.35s forwards;
     }
 
-    .tagline{
-      margin: 0 0 26px 0;
-      max-width: 720px;
-      line-height: 1.45;
+    /* ─── Masonry Grid ─── */
+    .masonry {
+      columns: 3;
+      column-gap: 20px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
     }
 
-    .grid{
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--gap);
-      align-items: start;
-    }
-
-    .card{
-      background: #fff;
+    .card {
+      break-inside: avoid;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--surface);
       border: 1px solid var(--line);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .card img{
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ─── Image Protection ─── */
+    .card { position: relative; }
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: transparent;
+    }
+    .card img {
       display: block;
       width: 100%;
-      height: 380px;
-      object-fit: cover;
+      height: auto;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      -webkit-touch-callout: none;
     }
 
-    @media (min-width: 1100px){
-      .wrap{ padding-right: 140px; }
+    /* ─── Animations ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: repeat(2, 1fr); }
-      .sidenav{
-        right: 16px;
-        top: 16px;
-        background: rgba(255,255,255,0.92);
-        border: 1px solid var(--line);
-        padding: 12px;
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        transition-duration: 0.01ms !important;
       }
-      .sidenav a{ font-size: 16px; }
     }
 
-    @media (max-width: 620px){
-      .grid{ grid-template-columns: 1fr; }
-      .card img{ height: 340px; }
-      header{ flex-direction: column; align-items: flex-start; }
+    /* ─── Custom Cursor ─── */
+    .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid var(--ink);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s ease, height 0.25s ease, opacity 0.25s ease;
+      opacity: 0;
+    }
+    .cursor.visible { opacity: 1; }
+    .cursor.hover {
+      width: 44px;
+      height: 44px;
+    }
+
+    /* ─── Lightbox ─── */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      cursor: pointer;
+    }
+    .lightbox.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 4px;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 32px;
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.7);
+      background: none;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: color 0.2s ease;
+    }
+    .lightbox-close:hover { color: #fff; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 980px) {
+      .masonry { columns: 2; }
+      .page { padding: 100px 24px 60px; }
+    }
+    @media (max-width: 768px) {
+      .nav { padding: 20px 24px; gap: 20px; }
+      .cursor { display: none; }
+      body, a, button { cursor: auto !important; }
+    }
+    @media (max-width: 560px) {
+      .masonry { columns: 1; column-gap: 0; }
+      .page-title { margin-bottom: 4px; }
+      .page-subtitle { margin-bottom: 32px; }
     }
   </style>
 </head>
-
 <body>
-  <nav class="sidenav" aria-label="Site">
-    <a href="index.html">HOME</a>
-    <a class="active" href="art.html">ART</a>
+
+  <div class="cursor" id="cursor"></div>
+  <canvas class="grain" id="grain"></canvas>
+  <canvas id="topo"></canvas>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" aria-label="Close">ESC</button>
+    <img id="lightbox-img" src="" alt="Artwork enlarged" />
+  </div>
+
+  <nav class="nav" aria-label="Site navigation">
+    <a href="index.html">Home</a>
+    <a class="active" href="art.html">Art</a>
   </nav>
 
-  <div class="wrap">
-    <header>
-      <div class="name">Mohan Golleru</div>
-    </header>
+  <main class="page">
+    <h1 class="page-title">Art</h1>
 
-    <p class="tagline">
-      Art
-    </p>
 
-    <div class="grid">
-      <div class="card"><img src="assets/1.png" alt="Artwork 1" loading="lazy"></div>
-      <div class="card"><img src="assets/2.png" alt="Artwork 2" loading="lazy"></div>
-      <div class="card"><img src="assets/3.png" alt="Artwork 3" loading="lazy"></div>
-      <div class="card"><img src="assets/4.png" alt="Artwork 4" loading="lazy"></div>
-      <div class="card"><img src="assets/5.png" alt="Artwork 5" loading="lazy"></div>
-      <div class="card"><img src="assets/6.jpg" alt="Artwork 6" loading="lazy"></div>
-      <div class="card"><img src="assets/7.jpg" alt="Artwork 7" loading="lazy"></div>
-      <div class="card"><img src="assets/8.jpg" alt="Artwork 8" loading="lazy"></div>
-      <div class="card"><img src="assets/9.jpg" alt="Artwork 9" loading="lazy"></div>
+    <div class="masonry">
+      <div class="card"><img src="assets/1.png" alt="Artwork" loading="lazy" /></div>
+      <div class="card"><img src="assets/2.png" alt="Artwork" loading="lazy" /></div>
+      <div class="card"><img src="assets/3.png" alt="Artwork" loading="lazy" /></div>
+      <div class="card"><img src="assets/4.png" alt="Artwork" loading="lazy" /></div>
+      <div class="card"><img src="assets/5.png" alt="Artwork" loading="lazy" /></div>
+      <div class="card"><img src="assets/6.jpg" alt="Artwork" loading="lazy" /></div>
+      <div class="card"><img src="assets/7.jpg" alt="Artwork" loading="lazy" /></div>
+      <div class="card"><img src="assets/8.jpg" alt="Artwork" loading="lazy" /></div>
+      <div class="card"><img src="assets/9.jpg" alt="Artwork" loading="lazy" /></div>
     </div>
-  </div>
+  </main>
+
+  <script>
+  /* ── Image Protection ── */
+  document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12') e.preventDefault();
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'I') e.preventDefault();
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') e.preventDefault();
+  });
+  document.addEventListener('dragstart', function(e) { e.preventDefault(); });
+
+  /* ── Interactive Topographic Contour Background ── */
+  (function() {
+    /* ── 3D Perlin Noise ── */
+    var P = new Uint8Array(512);
+    for (var i = 0; i < 256; i++) P[i] = P[i + 256] = ((i * 167) + 13) & 255;
+
+    function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+    function lerp(a, b, t) { return a + t * (b - a); }
+    function grad3(h, x, y, z) {
+      var s = h & 15;
+      var u = s < 8 ? x : y;
+      var v = s < 4 ? y : (s === 12 || s === 14 ? x : z);
+      return ((s & 1) ? -u : u) + ((s & 2) ? -v : v);
+    }
+
+    function noise(x, y, z) {
+      var X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
+      x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
+      var u = fade(x), v = fade(y), w = fade(z);
+      var A = P[X] + Y, AA = P[A] + Z, AB = P[A + 1] + Z;
+      var B = P[X + 1] + Y, BA = P[B] + Z, BB = P[B + 1] + Z;
+      return lerp(
+        lerp(
+          lerp(grad3(P[AA], x, y, z), grad3(P[BA], x-1, y, z), u),
+          lerp(grad3(P[AB], x, y-1, z), grad3(P[BB], x-1, y-1, z), u), v),
+        lerp(
+          lerp(grad3(P[AA+1], x, y, z-1), grad3(P[BA+1], x-1, y, z-1), u),
+          lerp(grad3(P[AB+1], x, y-1, z-1), grad3(P[BB+1], x-1, y-1, z-1), u), v),
+        w);
+    }
+
+    function fbm(x, y, z) {
+      var val = 0, amp = 0.5, freq = 1;
+      for (var i = 0; i < 4; i++) {
+        val += amp * noise(x * freq, y * freq, z * freq);
+        amp *= 0.5; freq *= 2;
+      }
+      return val;
+    }
+
+    /* ── Interactive Contour Rendering ── */
+    var canvas = document.getElementById('topo');
+    var ctx = canvas.getContext('2d');
+    var CELL = 8, SCALE = 0.006, LEVELS = 20;
+    var RADIUS = 150, Z_BOOST = 0.15, MOUSE_LERP = 0.12;
+    var mouseX = -9999, mouseY = -9999;
+    var targetX = -9999, targetY = -9999;
+    var dirty = true, settling = 0;
+
+    function smoothstep(t) { return t * t * (3 - 2 * t); }
+
+    function setupCanvas() {
+      var dpr = window.devicePixelRatio || 1;
+      var W = window.innerWidth, H = window.innerHeight;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      dirty = true;
+    }
+
+    function drawTopo() {
+      var W = window.innerWidth, H = window.innerHeight;
+      ctx.clearRect(0, 0, W, H);
+      ctx.strokeStyle = '#BEBEBE';
+      ctx.lineWidth = 0.8;
+      ctx.lineCap = 'round';
+
+      var cols = Math.ceil(W / CELL) + 2;
+      var rows = Math.ceil(H / CELL) + 2;
+
+      /* Build noise grid with cursor influence */
+      var grid = [];
+      for (var j = 0; j < rows; j++) {
+        grid[j] = [];
+        for (var i = 0; i < cols; i++) {
+          var px = i * CELL, py = j * CELL;
+          var dx = px - mouseX, dy = py - mouseY;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          var t = Math.max(0, 1 - dist / RADIUS);
+          var zOff = smoothstep(t) * Z_BOOST;
+          grid[j][i] = fbm(i * SCALE + 0.5, j * SCALE + 0.5, zOff);
+        }
+      }
+
+      /* Marching squares for each contour level */
+      for (var l = 1; l < LEVELS; l++) {
+        var th = -0.4 + (l / LEVELS) * 0.8;
+        ctx.beginPath();
+
+        for (var j = 0; j < rows - 1; j++) {
+          for (var i = 0; i < cols - 1; i++) {
+            var tl = grid[j][i], tr = grid[j][i + 1];
+            var bl = grid[j + 1][i], br = grid[j + 1][i + 1];
+            var cfg = (tl >= th ? 8 : 0) | (tr >= th ? 4 : 0) | (br >= th ? 2 : 0) | (bl >= th ? 1 : 0);
+
+            if (cfg === 0 || cfg === 15) continue;
+
+            var x = i * CELL, y = j * CELL, c = CELL;
+            var ip = function(a, b) { return (th - a) / (b - a); };
+
+            var tp = [x + ip(tl, tr) * c, y];
+            var rp = [x + c, y + ip(tr, br) * c];
+            var bp = [x + ip(bl, br) * c, y + c];
+            var lp = [x, y + ip(tl, bl) * c];
+
+            var seg = function(a, b) { ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); };
+
+            switch (cfg) {
+              case 1: case 14: seg(lp, bp); break;
+              case 2: case 13: seg(bp, rp); break;
+              case 3: case 12: seg(lp, rp); break;
+              case 4: case 11: seg(tp, rp); break;
+              case 5: seg(lp, tp); seg(bp, rp); break;
+              case 6: case 9:  seg(tp, bp); break;
+              case 7: case 8:  seg(lp, tp); break;
+              case 10: seg(tp, rp); seg(lp, bp); break;
+            }
+          }
+        }
+        ctx.stroke();
+      }
+    }
+
+    /* ── Animation Loop ── */
+    function tick() {
+      requestAnimationFrame(tick);
+      var prevX = mouseX, prevY = mouseY;
+      mouseX += (targetX - mouseX) * MOUSE_LERP;
+      mouseY += (targetY - mouseY) * MOUSE_LERP;
+      var moved = Math.abs(mouseX - prevX) > 0.1 || Math.abs(mouseY - prevY) > 0.1;
+      if (moved) { dirty = true; settling = 10; }
+      else if (settling > 0) { settling--; dirty = true; }
+      if (dirty) { drawTopo(); dirty = false; }
+    }
+
+    setupCanvas();
+    requestAnimationFrame(tick);
+
+    document.addEventListener('mousemove', function(e) {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      dirty = true;
+    });
+
+    document.addEventListener('mouseleave', function() {
+      targetX = -9999;
+      targetY = -9999;
+      dirty = true;
+    });
+
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(setupCanvas, 200);
+    });
+  })();
+
+  /* ── Grain Texture ── */
+  (function() {
+    var c = document.getElementById('grain');
+    var ctx = c.getContext('2d');
+    c.width = 256;
+    c.height = 256;
+    var d = ctx.createImageData(256, 256);
+    for (var i = 0; i < d.data.length; i += 4) {
+      var v = Math.random() * 255;
+      d.data[i] = d.data[i+1] = d.data[i+2] = v;
+      d.data[i+3] = 255;
+    }
+    ctx.putImageData(d, 0, 0);
+  })();
+
+  /* ── Lightbox ── */
+  (function() {
+    var box = document.getElementById('lightbox');
+    var img = document.getElementById('lightbox-img');
+    document.querySelectorAll('.card').forEach(function(card) {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function() {
+        var src = card.querySelector('img').getAttribute('src');
+        img.setAttribute('src', src);
+        box.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    function closeLightbox() {
+      box.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    box.addEventListener('click', closeLightbox);
+    document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+  })();
+
+  /* ── Custom Cursor ── */
+  (function() {
+    var cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', function(e) {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      if (!cursor.classList.contains('visible')) cursor.classList.add('visible');
+    });
+    document.querySelectorAll('a, button, .card').forEach(function(el) {
+      el.addEventListener('mouseenter', function() { cursor.classList.add('hover'); });
+      el.addEventListener('mouseleave', function() { cursor.classList.remove('hover'); });
+    });
+  })();
+
+  /* ── Page Transitions ── */
+  (function() {
+    document.body.classList.add('loaded');
+    document.querySelectorAll('a[href]').forEach(function(link) {
+      if (link.hostname !== window.location.hostname && link.hostname !== '') return;
+      if (link.getAttribute('href').startsWith('mailto:')) return;
+      if (link.target === '_blank') return;
+      link.addEventListener('click', function(e) {
+        var href = link.getAttribute('href');
+        e.preventDefault();
+        document.body.classList.add('fading');
+        document.body.classList.remove('loaded');
+        setTimeout(function() { window.location.href = href; }, 400);
+      });
+    });
+  })();
+  </script>
+
 </body>
 </html>
