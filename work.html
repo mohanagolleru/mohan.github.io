@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Work | Mohan Golleru</title>
+  <meta name="description" content="Notes, tutorials, and teaching material." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #F2E4CF;
+      --card: #FEF5E7;
+      --ink: #3A3630;
+      --heading: #38512F;
+      --muted: #6B5D4F;
+      --accent: #3A7BAA;
+      --font-heading: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+      --font-body: 'Source Sans 3', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 17px; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      min-height: 100vh;
+    }
+    body.loaded { opacity: 1; }
+    body.fading { opacity: 0; }
+
+    .nav {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .nav a {
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--muted);
+      transition: color 0.2s ease;
+    }
+    .nav a.active { color: var(--heading); }
+    .nav a:hover  { color: var(--heading); }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 128px 40px 120px;
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: clamp(2.2rem, 4.5vw + 0.5rem, 3.4rem);
+      line-height: 1.1;
+      color: var(--heading);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+    h1::before {
+      content: ">";
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .tagline {
+      font-family: var(--font-body);
+      font-size: 1.02rem;
+      color: var(--muted);
+      margin-bottom: 56px;
+      padding-left: 44px;
+    }
+
+    .entries {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .entries li {
+      margin-bottom: 32px;
+    }
+    .entries a {
+      display: block;
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--heading);
+      text-decoration: none;
+      position: relative;
+      padding-left: 32px;
+      transition: color 0.2s ease;
+      border-bottom: none;
+    }
+    .entries a::before {
+      content: ">";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .entries a:hover { color: var(--accent); }
+    .entries .desc {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--font-body);
+      font-size: 0.98rem;
+      font-weight: 400;
+      color: var(--muted);
+      font-style: italic;
+      padding-left: 32px;
+    }
+
+    @media (max-width: 600px) {
+      html { font-size: 16px; }
+      main { padding: 96px 24px 80px; }
+      .nav { padding: 20px 24px; gap: 14px; }
+      .entries a { font-size: 1.2rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav" aria-label="Site navigation">
+    <a href="index.html">Home</a>
+    <a href="art.html">Art</a>
+    <a class="active" href="work.html">Work</a>
+  </nav>
+
+  <main>
+    <h1>Work</h1>
+
+    <ul class="entries">
+      <li>
+        <a href="work/agentic-coding.html">
+          1. Agentic Coding or is it Vibe Coding?
+        </a>
+      </li>
+    </ul>
+  </main>
+
+  <script>
+    document.body.classList.add('loaded');
+
+    document.querySelectorAll('a[href]').forEach(function(link) {
+      if (link.hostname !== window.location.hostname && link.hostname !== '') return;
+      if (link.getAttribute('href').startsWith('mailto:')) return;
+      if (link.target === '_blank') return;
+      link.addEventListener('click', function(e) {
+        var href = link.getAttribute('href');
+        e.preventDefault();
+        document.body.classList.add('fading');
+        document.body.classList.remove('loaded');
+        setTimeout(function() { window.location.href = href; }, 400);
+      });
+    });
+  </script>
+
+</body>
+</html>

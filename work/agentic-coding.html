@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>1. Agentic Coding or is it Vibe Coding? | Mohan Golleru</title>
+  <meta name="description" content="Build and publish a website by talking to an open-source agentic coding tool." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #F2E4CF;
+      --card: #FEF5E7;
+      --ink: #3A3630;
+      --heading: #38512F;
+      --muted: #6B5D4F;
+      --line: rgba(58, 54, 48, 0.12);
+      --accent: #3A7BAA;
+
+      --term-bg: #1E1B17;
+      --term-text: #E8DDC8;
+      --term-cmd: #A8C37C;
+      --term-str: #E8C76C;
+      --term-flag: #D4A55C;
+      --term-dim: #7A6F60;
+      --term-comment: #6B5D4F;
+
+      --font-heading: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+      --font-body: 'Source Sans 3', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 17px; scroll-behavior: smooth; scroll-padding-top: 100px; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    body.loaded { opacity: 1; }
+    body.fading { opacity: 0; }
+
+    .nav {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 100;
+      padding: 32px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .nav a {
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--muted);
+      transition: color 0.2s ease;
+    }
+    .nav a.active { color: var(--heading); }
+    .nav a:hover  { color: var(--heading); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 760px);
+      gap: 72px;
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 112px 40px 120px;
+    }
+
+    .sidebar {
+      align-self: start;
+      position: sticky;
+      top: 100px;
+    }
+    .sidebar-inner {
+      background: var(--card);
+      padding: 28px 30px;
+      border-radius: 4px;
+    }
+    .sidebar-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--heading);
+      margin-bottom: 20px;
+      letter-spacing: -0.005em;
+    }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 12px;
+      font-family: var(--font-heading);
+      font-size: 0.93rem;
+      line-height: 1.4;
+    }
+    .sidebar li:last-child { margin-bottom: 0; }
+    .sidebar li::before {
+      content: ">";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--accent);
+      font-weight: 500;
+      transition: color 0.15s ease, font-weight 0.15s ease;
+    }
+    .sidebar a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: none;
+      display: block;
+      transition: color 0.15s ease;
+    }
+    .sidebar a:hover { color: var(--heading); }
+    .sidebar li.active a { color: var(--heading); font-weight: 700; }
+    .sidebar li.active::before { color: var(--heading); font-weight: 700; }
+
+    .content { min-width: 0; }
+
+    h1.title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: clamp(2.2rem, 4.5vw + 0.5rem, 3.4rem);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: var(--heading);
+      margin-bottom: 48px;
+    }
+
+    h2 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: var(--heading);
+      margin-top: 72px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      scroll-margin-top: 100px;
+    }
+    h2::before {
+      content: ">";
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    h3 {
+      font-family: var(--font-heading);
+      font-weight: 500;
+      font-size: 1.15rem;
+      color: var(--heading);
+      margin-top: 36px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    h3::before {
+      content: ">";
+      color: var(--accent);
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 1.02rem;
+      margin-bottom: 18px;
+      color: var(--ink);
+    }
+
+    strong { font-weight: 600; color: var(--heading); }
+    em { font-style: italic; color: var(--muted); }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(58, 123, 170, 0.35);
+      transition: border-color 0.2s ease;
+    }
+    a:hover { border-bottom-color: var(--accent); }
+
+    ul.chev, ol.chev {
+      list-style: none;
+      padding-left: 0;
+      margin: 0 0 24px 0;
+    }
+    ul.chev li, ol.chev li {
+      position: relative;
+      padding-left: 26px;
+      margin-bottom: 10px;
+      font-size: 1.02rem;
+      color: var(--ink);
+    }
+    ul.chev li::before, ol.chev li::before {
+      content: ">";
+      position: absolute;
+      left: 4px;
+      top: 0;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    /* ─── Terminal blocks (for actual shell commands) ─── */
+    pre.term {
+      background: var(--term-bg);
+      color: var(--term-text);
+      padding: 20px 24px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      margin: 18px 0 26px;
+      position: relative;
+    }
+    pre.term .prompt  { color: var(--term-dim); user-select: none; }
+    pre.term .cmd     { color: var(--term-cmd); font-weight: 500; }
+    pre.term .flag    { color: var(--term-flag); }
+    pre.term .str     { color: var(--term-str); }
+    pre.term .comment { color: var(--term-comment); font-style: italic; }
+
+    /* ─── Prompt blocks (for pasting into Cline chat) ─── */
+    pre.prompt {
+      background: var(--card);
+      border-left: 4px solid var(--accent);
+      padding: 16px 24px 20px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: var(--ink);
+      white-space: pre-wrap;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      margin: 18px 0 26px;
+      position: relative;
+    }
+    pre.prompt::before {
+      content: "copy this prompt";
+      display: block;
+      font-family: var(--font-heading);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+      user-select: none;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: transparent;
+      border-radius: 3px;
+      padding: 4px 10px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+    pre.term .copy-btn {
+      color: var(--term-dim);
+      border: 1px solid var(--term-dim);
+    }
+    pre.term .copy-btn:hover {
+      color: var(--term-text);
+      border-color: var(--term-text);
+    }
+    pre.term .copy-btn.copied {
+      color: var(--term-cmd);
+      border-color: var(--term-cmd);
+    }
+    pre.prompt .copy-btn {
+      color: var(--muted);
+      border: 1px solid var(--muted);
+    }
+    pre.prompt .copy-btn:hover {
+      color: var(--heading);
+      border-color: var(--heading);
+    }
+    pre.prompt .copy-btn.copied {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    pre.term:hover .copy-btn,
+    pre.prompt:hover .copy-btn { opacity: 1; }
+
+    code.inline {
+      font-family: var(--font-mono);
+      font-size: 0.92em;
+      background: rgba(58, 54, 48, 0.08);
+      padding: 1px 6px;
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 28px;
+      font-size: 0.95rem;
+    }
+    thead th {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--heading);
+      text-align: left;
+      padding: 10px 16px 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    tbody td {
+      padding: 12px 16px 12px 0;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      color: var(--ink);
+      font-size: 0.92rem;
+    }
+    td code.inline { font-size: 0.85em; }
+
+    .walkthrough {
+      margin: 24px 0 8px;
+      counter-reset: wstep;
+    }
+    .walkthrough figure {
+      counter-increment: wstep;
+      margin: 0 0 28px;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .walkthrough figure::before {
+      content: counter(wstep, decimal-leading-zero);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--accent);
+      padding-top: 2px;
+    }
+    .walkthrough .wstep-body p {
+      font-size: 0.98rem;
+      margin-bottom: 12px;
+    }
+    .walkthrough figure img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: var(--term-bg);
+    }
+
+    figure.diagram { margin: 28px 0 32px; }
+    figure.diagram img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: var(--card);
+    }
+    figure.diagram figcaption {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 12px;
+      font-style: italic;
+      line-height: 1.55;
+      padding-left: 14px;
+      border-left: 2px solid var(--accent);
+    }
+
+    footer {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 40px 80px calc(40px + 240px + 72px);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    footer::before { content: "> "; color: var(--accent); font-weight: 500; }
+    footer a {
+      color: var(--muted);
+      border-bottom: 1px solid rgba(107, 93, 79, 0.3);
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 88px 24px 80px;
+      }
+      .sidebar { position: static; }
+      .sidebar-inner { padding: 22px 26px; }
+      footer { padding: 0 24px 80px; }
+    }
+    @media (max-width: 600px) {
+      html { font-size: 16px; }
+      .nav { padding: 20px 24px; gap: 14px; }
+      h2 { font-size: 1.4rem; margin-top: 56px; }
+      h3 { font-size: 1.05rem; }
+      pre.term { padding: 16px 18px; font-size: 0.8rem; }
+      pre.prompt { padding: 14px 20px 18px; font-size: 0.82rem; }
+      .copy-btn { opacity: 1; }
+      .walkthrough figure { grid-template-columns: 1fr; }
+      .walkthrough figure::before { padding-top: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav" aria-label="Site navigation">
+    <a href="../index.html">Home</a>
+    <a href="../art.html">Art</a>
+    <a class="active" href="../work.html">Work</a>
+  </nav>
+
+  <main class="layout">
+
+    <aside class="sidebar" aria-label="Tutorial outline">
+      <div class="sidebar-inner">
+        <div class="sidebar-title">Outline</div>
+        <ul>
+          <li><a href="#setup">Set up</a></li>
+          <li><a href="#shift">What changed</a></li>
+          <li><a href="#tools">Tools</a></li>
+          <li><a href="#cline-setup">Set up Cline</a></li>
+          <li><a href="#build">Build the site</a></li>
+          <li><a href="#publish">Publish</a></li>
+          <li><a href="#reference">Reference</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="content">
+
+      <h1 class="title">1. Agentic Coding or is it Vibe Coding?</h1>
+
+      <h2 id="setup">Set up</h2>
+
+      <ol class="chev">
+        <li><strong>GitHub account</strong> at <a href="https://github.com/signup">github.com/signup</a>. Pick a username you will put on a résumé. This will be part of your public site URL later.</li>
+        <li><strong>OpenRouter account</strong> at <a href="https://openrouter.ai">openrouter.ai</a>. Go to <a href="https://openrouter.ai/settings/keys">openrouter.ai/settings/keys</a>, click Create Key, copy the key that starts with <code class="inline">sk-or-</code>, and save it in a note. No credit card required.</li>
+        <li><strong>Node.js 20 or newer</strong> from <a href="https://nodejs.org">nodejs.org</a>. Pick the LTS version. On Windows, keep "Add to PATH" checked during install. Verify with <code class="inline">node --version</code> in any terminal.</li>
+      </ol>
+
+
+      <h2 id="shift">What changed</h2>
+
+      <p>For fifty years, using a computer to do anything useful meant writing code. Rules in a language the machine understood. If you couldn't code, you couldn't automate. Whole fields were stuck not for lack of ideas but for lack of people who could implement them.</p>
+
+      <p>Large language models changed the input from code to English. An <strong>agent</strong> is a language model wired to real tools: files, terminal, browser, git. You say "save this to a file" and the agent actually saves the file. You say "push this to GitHub" and it pushes. The model picks the next step based on your request and what it sees from the last one. That loop is the agent.</p>
+
+      <figure class="diagram">
+        <img src="../assets/A1.png" alt="Three paradigms for using a language model. Top: prompting, where a prompt goes into an LLM and returns an answer. Middle: fixed steps, where a prompt is processed through a vector search step and then an LLM. Bottom: autonomous steps, where the LLM produces a plan and takes actions in a loop, updating the plan until it reaches an answer. This is called an LLM agent. A vertical control and autonomy scale on the right shows less autonomy at the top and more autonomy at the bottom." />
+        <figcaption>Three ways to use a language model. As you move down, the model gets more autonomy and you give up direct control. Agents live at the bottom: you describe intent, the model plans and executes.</figcaption>
+      </figure>
+
+      <p>The skill is no longer knowing syntax. It is describing what you want precisely enough for an agent to execute it.</p>
+
+
+      <h2 id="tools">Tools</h2>
+
+      <p>Several agentic coding tools exist. Some are open source and free, some are proprietary and paid. All of them work on the same principle: you describe intent, the agent executes. The skill you practice in one transfers to all of them.</p>
+
+      <h3>The landscape</h3>
+
+      <p>These are the tools worth knowing in April 2026. Today's workshop uses Cline because it is open source, installs with one command, and works with free OpenRouter models out of the box.</p>
+
+      <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Form factor</th>
+            <th>Open source</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Cline</strong></td>
+            <td>CLI, also a VS Code extension</td>
+            <td>Yes</td>
+            <td><a href="https://cline.bot">cline.bot</a></td>
+          </tr>
+          <tr>
+            <td><strong>Roo Code</strong></td>
+            <td>VS Code extension (fork of Cline)</td>
+            <td>Yes</td>
+            <td><a href="https://roocode.com">roocode.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>Aider</strong></td>
+            <td>Python CLI, git-native</td>
+            <td>Yes</td>
+            <td><a href="https://aider.chat">aider.chat</a></td>
+          </tr>
+          <tr>
+            <td><strong>OpenCode</strong></td>
+            <td>Terminal UI agent</td>
+            <td>Yes</td>
+            <td><a href="https://opencode.ai">opencode.ai</a></td>
+          </tr>
+          <tr>
+            <td><strong>Qwen Code</strong></td>
+            <td>Terminal agent, from Alibaba</td>
+            <td>Yes</td>
+            <td><a href="https://qwen.ai/qwencode">qwen.ai/qwencode</a></td>
+          </tr>
+          <tr>
+            <td><strong>Claude Code</strong></td>
+            <td>CLI, from Anthropic</td>
+            <td>No</td>
+            <td><a href="https://claude.com/claude-code">claude.com/claude-code</a></td>
+          </tr>
+          <tr>
+            <td><strong>Codex</strong></td>
+            <td>CLI, from OpenAI</td>
+            <td>No</td>
+            <td><a href="https://github.com/openai/codex">github.com/openai/codex</a></td>
+          </tr>
+          <tr>
+            <td><strong>Cursor</strong></td>
+            <td>Full VS Code fork, paid</td>
+            <td>No</td>
+            <td><a href="https://cursor.com">cursor.com</a></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <p>Open-source tools work with any model provider, including OpenRouter's free catalog. Proprietary tools (Claude Code, Codex, Cursor) are locked to their vendor's models, usually behind a subscription. If you want to stay entirely free, stick to the first five rows.</p>
+
+      <h3>OpenRouter</h3>
+
+      <p>OpenRouter is a single API gateway in front of one hundred plus language models, including several free open-source ones. One API key, many models. Browse the current free catalog at <a href="https://openrouter.ai/collections/free-models">openrouter.ai/collections/free-models</a>. Today:</p>
+
+      <table>
+        <thead>
+          <tr><th>Model</th><th>Best for</th><th>Context</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="inline">qwen/qwen3-coder:free</code></td><td>HTML, CSS, code</td><td>262K</td></tr>
+          <tr><td><code class="inline">deepseek/deepseek-r1:free</code></td><td>Reasoning, debugging</td><td>128K</td></tr>
+          <tr><td><code class="inline">meta-llama/llama-3.3-70b-instruct:free</code></td><td>General fallback</td><td>128K</td></tr>
+        </tbody>
+      </table>
+
+
+      <h2 id="cline-setup">Set up Cline</h2>
+
+      <p>Three steps: install Cline, pick your provider and model, start Cline. Open a terminal first. On Mac, use Terminal or iTerm. On Windows, use Windows Terminal.</p>
+
+      <h3>1. Install Cline</h3>
+
+      <p>The install command is the same on Mac and Windows. In your terminal, run:</p>
+
+<pre class="term"><span class="cmd">npm</span> install <span class="flag">-g</span> cline</pre>
+
+      <p>Windows users: if you get a permission error, close the terminal, reopen <strong>Windows Terminal as Administrator</strong> (right-click the icon → Run as administrator), and try again.</p>
+
+      <p>Verify the install:</p>
+
+<pre class="term"><span class="cmd">cline</span> --version</pre>
+
+      <h3>2. Pick your provider and model</h3>
+
+      <p>Start the interactive setup wizard:</p>
+
+<pre class="term"><span class="cmd">cline</span> auth</pre>
+
+      <p>Cline shows a list of providers. Use the arrow keys to highlight <strong>OpenRouter</strong> and press <code class="inline">Enter</code>. When it asks for an API key, paste the <code class="inline">sk-or-</code> key you saved earlier and press <code class="inline">Enter</code>.</p>
+
+      <p>Cline then shows a list of available models. Scroll down to the free models (they have <code class="inline">:free</code> in the name) and pick one. Good starting choices: <code class="inline">qwen/qwen3-coder:free</code>, <code class="inline">deepseek/deepseek-r1:free</code>, or <code class="inline">stepfun/step-3.5-flash:free</code>. Press <code class="inline">Enter</code> to confirm. Cline is now configured.</p>
+
+      <h3>3. Start Cline</h3>
+
+      <p>From anywhere in your terminal, type:</p>
+
+<pre class="term"><span class="cmd">cline</span></pre>
+
+      <p>An interactive chat interface takes over your terminal. You will see a <code class="inline">&gt;</code> prompt at the bottom where you type instructions, and Cline's responses and actions appear above. At the bottom of the screen there are two modes you can toggle with <code class="inline">Tab</code>: <strong>Plan</strong> (Cline explains what it would do without touching anything) and <strong>Act</strong> (Cline actually does the thing).</p>
+
+      <p>Leave Cline running. Everything in the next section happens inside this chat interface.</p>
+
+
+      <h2 id="build">Build the site</h2>
+
+      <h3>1. Create a folder and generate the site</h3>
+
+      <p>Open <strong>Finder</strong> on Mac or <strong>File Explorer</strong> on Windows. Go to your Desktop, right-click in empty space, and create a new folder called <code class="inline">portfolio</code>. Drag the profile photo and any other images you want on your site (project photos, research figures, anything visual) into this folder.</p>
+
+      <p>Now switch back to your terminal where Cline is running. Your first instruction generates the website inside the folder you just made. The prompt is long on purpose. Every phrase prevents a way the agent could go wrong, or pushes it toward a more interesting design. Vague instructions produce vague websites.</p>
+
+      <p>Copy the prompt below, paste it at the <code class="inline">&gt;</code> prompt, and press Enter:</p>
+
+<pre class="prompt">Create a single-file portfolio website in the portfolio folder on my Desktop, called index.html. Use only HTML and CSS in one file, no JavaScript, no external frameworks. Google Fonts are allowed. Make it visually distinctive with a deliberate color palette that has warmth and personality, not plain white or gray. Consider warm earth tones, deep jewel tones, or a modern editorial look. Pair two complementary Google Fonts: a serif or display font for headings and a clean sans-serif for body text. Add visual details: a colored accent bar or divider, soft shadows on cards, smooth hover transitions on links, generous whitespace between sections. Sections: a full-width hero with my name as a large heading, a one-line tagline, and a small visual element. An About section with a 2 to 4 sentence bio area. A Projects section with three cards, each showing a title, a one-sentence description, and a gentle hover effect. A Publications section as a clean chronological list with year markers. A Contact section with email and GitHub links as styled underlined text. Mobile-responsive with a single column layout below 700px. Use the image files already in the portfolio folder: place one that looks like a profile photo as a circular avatar in the hero, and use any others as decorative elements in the Projects section.</pre>
+
+      <p>Cline will ask for permission before writing the file. Press <code class="inline">y</code> or <strong>Approve</strong> at each prompt. Wait 30 to 90 seconds.</p>
+
+      <p>When Cline finishes, ask it to open the file so you can see it:</p>
+
+<pre class="prompt">open the index.html file in my default browser</pre>
+
+      <p>Your browser launches with your new site loaded. <strong>Keep that browser tab open for the rest of the workshop.</strong> Every time Cline changes the file, you will return to the tab and press refresh.</p>
+
+      <h3>2. Fill in your content</h3>
+
+      <p>The site exists and your images are already placed, but the text is still placeholder. Replace the ALL-CAPS parts below with your real bio, projects, and publications, then paste the whole thing into Cline:</p>
+
+<pre class="prompt">Update index.html. Change the name in the hero to 'YOUR NAME'. Replace the tagline with 'YOUR TAGLINE'. Replace the About section with this bio: 'YOUR BIO'. For the three project cards use: 1) TITLE - DESCRIPTION, 2) TITLE - DESCRIPTION, 3) TITLE - DESCRIPTION. Publications: PUB1, PUB2, PUB3. Email: YOUR_EMAIL. GitHub: YOUR_USERNAME.</pre>
+
+      <p>Switch to your browser tab and refresh. Your real content is on the page. If Cline picked the wrong file for your profile photo, tell it: <em>"the profile photo is wrong, use [filename] instead."</em></p>
+
+      <h3>3. Iterate like a designer</h3>
+
+      <p>The rest of the build is a conversation with Cline about how the site should look. Paste any of these, refresh the browser after each, then invent your own:</p>
+
+<pre class="prompt">make the hero section dark mode with white text</pre>
+
+<pre class="prompt">the project cards feel flat, give them rounded corners and a soft shadow</pre>
+
+<pre class="prompt">change the color scheme to something warmer, like terracotta</pre>
+
+      <p>The real skill you are practicing here is writing clear, specific requests. "Make it better" will not work. "The project cards look crowded, give them more padding and tighter headings" will. Be precise about what you see, what you want instead, and why.</p>
+
+      <h3>4. If something breaks</h3>
+
+      <p>Four fixes solve almost everything. When the site stops looking right, or Cline stops making sense, come back to this table and tell Cline the matching line.</p>
+
+      <table>
+        <thead>
+          <tr><th>Problem</th><th>What to tell Cline</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Something looks broken after a change</td>
+            <td><code class="inline">undo the last change to index.html</code></td>
+          </tr>
+          <tr>
+            <td>Cline is confused or going in circles</td>
+            <td><code class="inline">start over, rewrite index.html from scratch with the same sections</code></td>
+          </tr>
+          <tr>
+            <td>You want to see the file contents</td>
+            <td><code class="inline">show me what index.html looks like now</code></td>
+          </tr>
+          <tr>
+            <td>Hit an OpenRouter rate limit</td>
+            <td>Quit Cline, run <code class="inline">cline auth -p openrouter -k sk-or-YOUR-KEY -m deepseek/deepseek-r1:free</code>, then start Cline again</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>If the problem is not in this table, describe it to Cline in plain English. <em>"The hero text disappeared after I asked for dark mode, help me fix it."</em> The agent can usually debug its own output.</p>
+
+
+      <h2 id="publish">Publish</h2>
+
+      <p>A repository named exactly <code class="inline">your-username.github.io</code> automatically becomes a live website at <code class="inline">https://your-username.github.io</code>. That is the whole trick.</p>
+
+      <h3>1. Get a GitHub Personal Access Token</h3>
+
+      <p>Cline needs permission to create a repository on your GitHub account. The cleanest way is a short-lived Personal Access Token that you paste into Cline when it asks.</p>
+
+      <p>Go to <a href="https://github.com/settings/tokens/new">github.com/settings/tokens/new</a>. Give it a name (<em>Cline workshop</em> is fine), set <strong>Expiration</strong> to <strong>7 days</strong>, check the <strong>repo</strong> scope at the top of the scope list, scroll to the bottom, and click <strong>Generate token</strong>. Copy the token that appears. It starts with <code class="inline">ghp_</code>. Save it in a note for the next minute. You will paste it into Cline and then never use it again.</p>
+
+      <h3>2. Tell Cline to publish</h3>
+
+      <p>Back in your terminal where Cline is running, replace <code class="inline">USERNAME</code> with your GitHub username in both places and paste:</p>
+
+<pre class="prompt">Publish this folder as my personal website at USERNAME.github.io. My GitHub username is USERNAME.</pre>
+
+      <p>Cline will start working. It turns your folder into a git repository, commits your files, and asks for your GitHub Personal Access Token so it can create the new repository and push. When the token prompt appears, paste the <code class="inline">ghp_</code> token you copied a moment ago. Cline uses it once and does not save it.</p>
+
+      <p>Approve each shell command Cline asks to run. The whole sequence takes about 30 seconds. When it finishes, Cline reports the URL of your new repository.</p>
+
+      <p>If something fails partway through, describe what you see to Cline in plain English. The agent handles its own mistakes.</p>
+
+      <h3>3. Visit your live site</h3>
+
+      <p>Wait 60 seconds, then open this address in your browser:</p>
+
+<pre class="term">https://<span class="str">your-username</span>.github.io</pre>
+
+      <p>If you see a 404 page, refresh in another minute. GitHub Pages is slow on the first deploy.</p>
+
+
+
+      <h2 id="reference">Reference</h2>
+
+      <h3>Daily workflow</h3>
+
+      <ol class="chev">
+        <li>Open a terminal and <code class="inline">cd</code> into the folder you want to work in.</li>
+        <li>Run <code class="inline">cline</code> to start the chat interface.</li>
+        <li>Type or paste your request at the <code class="inline">&gt;</code> prompt. Press Enter.</li>
+        <li>Approve file changes and shell commands when Cline asks.</li>
+        <li>When you want to publish, ask Cline to re-publish the change.</li>
+      </ol>
+
+      <h3>Prompt patterns to know</h3>
+
+      <ul class="chev">
+        <li><strong>Generate:</strong> "Create X with these constraints: ..."</li>
+        <li><strong>Modify:</strong> "Update X to do Y. Keep everything else the same."</li>
+        <li><strong>Inspect:</strong> "Show me what X looks like now."</li>
+        <li><strong>Undo:</strong> "Undo the last change to X."</li>
+        <li><strong>Reset:</strong> "Start over. Rewrite X from scratch with the same sections."</li>
+        <li><strong>Publish:</strong> "Re-publish this change."</li>
+      </ul>
+
+      <h3>Free models on OpenRouter</h3>
+
+      <ul class="chev">
+        <li><code class="inline">qwen/qwen3-coder:free</code>. Code, HTML, CSS.</li>
+        <li><code class="inline">deepseek/deepseek-r1:free</code>. Reasoning, debugging.</li>
+        <li><code class="inline">meta-llama/llama-3.3-70b-instruct:free</code>. General fallback.</li>
+      </ul>
+
+      <p>To switch models, quit Cline and re-run <code class="inline">cline auth -p openrouter -k sk-or-YOUR-KEY -m MODEL-ID</code> with the model you want. Browse the full free catalog at <a href="https://openrouter.ai/collections/free-models">openrouter.ai/collections/free-models</a>.</p>
+
+      <h3>Further reading</h3>
+
+      <ul class="chev">
+        <li><a href="https://docs.cline.bot">Cline documentation</a>. Official docs, feature reference, settings.</li>
+        <li><a href="https://github.com/cline/cline">Cline on GitHub</a>. Source code, issues, community.</li>
+        <li><a href="https://openrouter.ai/collections/free-models">OpenRouter free models</a>. The live list.</li>
+        <li><a href="https://docs.roocode.com">Roo Code docs</a>. The other open-source VS Code agent, worth knowing.</li>
+      </ul>
+
+    </article>
+
+  </main>
+
+  <script>
+    document.body.classList.add('loaded');
+
+    /* Page transitions on non-anchor internal links */
+    document.querySelectorAll('a[href]').forEach(function(link) {
+      if (link.hostname !== window.location.hostname && link.hostname !== '') return;
+      if (link.getAttribute('href').startsWith('mailto:')) return;
+      if (link.getAttribute('href').startsWith('#')) return;
+      if (link.target === '_blank') return;
+      link.addEventListener('click', function(e) {
+        var href = link.getAttribute('href');
+        e.preventDefault();
+        document.body.classList.add('fading');
+        document.body.classList.remove('loaded');
+        setTimeout(function() { window.location.href = href; }, 400);
+      });
+    });
+
+    /* Copy buttons on both terminal and prompt blocks */
+    document.querySelectorAll('pre.term, pre.prompt').forEach(function(pre) {
+      var btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.type = 'button';
+      btn.textContent = 'Copy';
+      btn.addEventListener('click', function() {
+        var clone = pre.cloneNode(true);
+        var cb = clone.querySelector('.copy-btn');
+        if (cb) cb.remove();
+        var text = clone.innerText.trim();
+        navigator.clipboard.writeText(text).then(function() {
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(function() {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+          }, 1800);
+        });
+      });
+      pre.appendChild(btn);
+    });
+
+    /* Scrollspy: highlight the sidebar link for the visible section */
+    (function() {
+      var sections = document.querySelectorAll('article h2[id]');
+      var linkMap = {};
+      document.querySelectorAll('.sidebar a[href^="#"]').forEach(function(link) {
+        linkMap[link.getAttribute('href').slice(1)] = link.parentElement;
+      });
+
+      if (!('IntersectionObserver' in window) || sections.length === 0) return;
+
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          var li = linkMap[entry.target.id];
+          if (!li) return;
+          if (entry.isIntersecting) {
+            document.querySelectorAll('.sidebar li.active').forEach(function(el) {
+              el.classList.remove('active');
+            });
+            li.classList.add('active');
+          }
+        });
+      }, {
+        rootMargin: '-15% 0px -70% 0px',
+        threshold: 0
+      });
+
+      sections.forEach(function(s) { observer.observe(s); });
+
+      var firstId = sections[0] && sections[0].id;
+      if (firstId && linkMap[firstId]) linkMap[firstId].classList.add('active');
+    })();
+  </script>
+
+</body>
+</html>
