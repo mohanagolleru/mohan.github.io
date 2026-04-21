@@ -235,7 +235,7 @@
     pre.term .str     { color: var(--term-str); }
     pre.term .comment { color: var(--term-comment); font-style: italic; }
 
-    /* ─── Prompt blocks (for pasting into Cline chat) ─── */
+    /* ─── Prompt blocks (for pasting into OpenCode chat) ─── */
     pre.prompt {
       background: var(--card);
       border-left: 4px solid var(--accent);
@@ -453,7 +453,7 @@
           <li><a href="#setup">Set up</a></li>
           <li><a href="#shift">What changed</a></li>
           <li><a href="#tools">Tools</a></li>
-          <li><a href="#cline-setup">Set up Cline</a></li>
+          <li><a href="#opencode-setup">Set up OpenCode</a></li>
           <li><a href="#build">Build the site</a></li>
           <li><a href="#publish">Publish</a></li>
           <li><a href="#reference">Reference</a></li>
@@ -470,7 +470,7 @@
       <ol class="chev">
         <li><strong>GitHub account</strong> at <a href="https://github.com/signup">github.com/signup</a>. Pick a username you will put on a résumé. This will be part of your public site URL later.</li>
         <li><strong>OpenRouter account</strong> at <a href="https://openrouter.ai">openrouter.ai</a>. Go to <a href="https://openrouter.ai/settings/keys">openrouter.ai/settings/keys</a>, click Create Key, copy the key that starts with <code class="inline">sk-or-</code>, and save it in a note. No credit card required.</li>
-        <li><strong>Node.js 20 or newer</strong> from <a href="https://nodejs.org">nodejs.org</a>. Pick the LTS version. On Windows, keep "Add to PATH" checked during install. Verify with <code class="inline">node --version</code> in any terminal.</li>
+        <li><strong>Node.js 20 or newer</strong> (optional, only if you install OpenCode via npm) from <a href="https://nodejs.org">nodejs.org</a>. Pick the LTS version. On Windows, keep "Add to PATH" checked during install. Verify with <code class="inline">node --version</code> in any terminal. Skip this if you use the curl installer on Mac.</li>
       </ol>
 
 
@@ -493,7 +493,7 @@
 
       <h3>The landscape</h3>
 
-      <p>These are the tools worth knowing in April 2026. Today we use Cline because it is open source, installs with one command, and works with free OpenRouter models out of the box.</p>
+      <p>These are the tools worth knowing in April 2026. Today we use <strong>OpenCode</strong> because it is open source, installs with one command, and works with free OpenRouter models out of the box.</p>
 
       <div style="overflow-x: auto;">
       <table>
@@ -576,41 +576,53 @@
       </table>
 
 
-      <h2 id="cline-setup">Set up Cline</h2>
+      <h2 id="opencode-setup">Set up OpenCode</h2>
 
-      <p>Three steps: install Cline, pick your provider and model, start Cline. Open a terminal first. On Mac, use Terminal or iTerm. On Windows, use Windows Terminal.</p>
+      <p>Three steps: install OpenCode, connect OpenRouter, start OpenCode. Open a terminal first. On Mac, use Terminal or iTerm. On Windows, use Windows Terminal. (For a smoother Windows experience, see the optional WSL note at the end of this section.)</p>
 
-      <h3>1. Install Cline</h3>
+      <h3>1. Install OpenCode</h3>
 
-      <p>The install command is the same on Mac and Windows. In your terminal, run:</p>
+      <p>Pick one of the two install paths below. Both give you the same <code class="inline">opencode</code> command.</p>
 
-<pre class="term"><span class="cmd">npm</span> install <span class="flag">-g</span> cline</pre>
+      <p><strong>Mac or Linux</strong> — one command, no Node.js required:</p>
 
-      <p>Windows users: if you get a permission error, close the terminal, reopen <strong>Windows Terminal as Administrator</strong> (right-click the icon → Run as administrator), and try again.</p>
+<pre class="term"><span class="cmd">curl</span> <span class="flag">-fsSL</span> <span class="str">https://opencode.ai/install</span> | <span class="cmd">bash</span></pre>
+
+      <p><strong>Any platform via npm</strong> — works on Mac, Linux, and Windows if you installed Node.js above:</p>
+
+<pre class="term"><span class="cmd">npm</span> install <span class="flag">-g</span> opencode-ai</pre>
+
+      <p>Windows users: if the npm install gives a permission error, close the terminal, reopen <strong>Windows Terminal as Administrator</strong> (right-click the icon → Run as administrator), and try again.</p>
 
       <p>Verify the install:</p>
 
-<pre class="term"><span class="cmd">cline</span> --version</pre>
+<pre class="term"><span class="cmd">opencode</span> --version</pre>
 
-      <h3>2. Pick your provider and model</h3>
+      <h3>2. Connect OpenRouter</h3>
 
-      <p>Start the interactive setup wizard:</p>
+      <p>Start the interactive auth wizard:</p>
 
-<pre class="term"><span class="cmd">cline</span> auth</pre>
+<pre class="term"><span class="cmd">opencode</span> auth login</pre>
 
-      <p>Cline shows a list of providers. Use the arrow keys to highlight <strong>OpenRouter</strong> and press <code class="inline">Enter</code>. When it asks for an API key, paste the <code class="inline">sk-or-</code> key you saved earlier and press <code class="inline">Enter</code>.</p>
+      <p>OpenCode shows a list of providers. Use the arrow keys to highlight <strong>OpenRouter</strong> and press <code class="inline">Enter</code>. When it asks for an API key, paste the <code class="inline">sk-or-</code> key you saved earlier and press <code class="inline">Enter</code>. Your credentials are stored in <code class="inline">~/.local/share/opencode/auth.json</code>.</p>
 
-      <p>Cline then shows a list of available models. Scroll down to the free models (they have <code class="inline">:free</code> in the name) and pick one. Good starting choices: <code class="inline">qwen/qwen3-coder:free</code>, <code class="inline">deepseek/deepseek-r1:free</code>, or <code class="inline">stepfun/step-3.5-flash:free</code>. Press <code class="inline">Enter</code> to confirm. Cline is now configured.</p>
-
-      <h3>3. Start Cline</h3>
+      <h3>3. Start OpenCode and pick a model</h3>
 
       <p>From anywhere in your terminal, type:</p>
 
-<pre class="term"><span class="cmd">cline</span></pre>
+<pre class="term"><span class="cmd">opencode</span></pre>
 
-      <p>An interactive chat interface takes over your terminal. You will see a <code class="inline">&gt;</code> prompt at the bottom where you type instructions, and Cline's responses and actions appear above. At the bottom of the screen there are two modes you can toggle with <code class="inline">Tab</code>: <strong>Plan</strong> (Cline explains what it would do without touching anything) and <strong>Act</strong> (Cline actually does the thing).</p>
+      <p>An interactive chat interface (TUI) takes over your terminal. You will see a <code class="inline">&gt;</code> prompt at the bottom where you type instructions, and OpenCode's responses and actions appear above. At the bottom of the screen there are two modes you can toggle with <code class="inline">Tab</code>: <strong>Plan</strong> (OpenCode explains what it would do without touching anything) and <strong>Build</strong> (OpenCode actually does the thing).</p>
 
-      <p>Leave Cline running. Everything in the next section happens inside this chat interface.</p>
+      <p>Pick a free model with the slash command. At the <code class="inline">&gt;</code> prompt, type:</p>
+
+<pre class="term">/models</pre>
+
+      <p>Scroll down to the free models (they have <code class="inline">:free</code> in the name) and press <code class="inline">Enter</code>. Good starting choices: <code class="inline">qwen/qwen3-coder:free</code>, <code class="inline">deepseek/deepseek-r1:free</code>, or <code class="inline">meta-llama/llama-3.3-70b-instruct:free</code>.</p>
+
+      <p>Leave OpenCode running. Everything in the next section happens inside this chat interface.</p>
+
+      <p><em>Optional — Windows + WSL:</em> for better filesystem and terminal performance on Windows, install <a href="https://learn.microsoft.com/windows/wsl/install">WSL</a>, then run the curl install above inside your WSL terminal. Your Windows Desktop is reachable at <code class="inline">/mnt/c/Users/YOURNAME/Desktop</code>.</p>
 
 
       <h2 id="build">Build the site</h2>
@@ -619,31 +631,31 @@
 
       <p>Open <strong>Finder</strong> on Mac or <strong>File Explorer</strong> on Windows. Go to your Desktop, right-click in empty space, and create a new folder called <code class="inline">portfolio</code>. Drag the profile photo and any other images you want on your site (project photos, research figures, anything visual) into this folder.</p>
 
-      <p>Now switch back to your terminal where Cline is running. Your first instruction generates the website inside the folder you just made. The prompt is long on purpose. Every phrase prevents a way the agent could go wrong, or pushes it toward a more interesting design. Vague instructions produce vague websites.</p>
+      <p>Now switch back to your terminal where OpenCode is running. Your first instruction generates the website inside the folder you just made. The prompt is long on purpose. Every phrase prevents a way the agent could go wrong, or pushes it toward a more interesting design. Vague instructions produce vague websites.</p>
 
       <p>Copy the prompt below, paste it at the <code class="inline">&gt;</code> prompt, and press Enter:</p>
 
 <pre class="prompt">Create a single-file portfolio website in the portfolio folder on my Desktop, called index.html. Use only HTML and CSS in one file, no JavaScript, no external frameworks. Google Fonts are allowed. Make it visually distinctive with a deliberate color palette that has warmth and personality, not plain white or gray. Consider warm earth tones, deep jewel tones, or a modern editorial look. Pair two complementary Google Fonts: a serif or display font for headings and a clean sans-serif for body text. Add visual details: a colored accent bar or divider, soft shadows on cards, smooth hover transitions on links, generous whitespace between sections. Sections: a full-width hero with my name as a large heading, a one-line tagline, and a small visual element. An About section with a 2 to 4 sentence bio area. A Projects section with three cards, each showing a title, a one-sentence description, and a gentle hover effect. A Publications section as a clean chronological list with year markers. A Contact section with email and GitHub links as styled underlined text. Mobile-responsive with a single column layout below 700px. Use the image files already in the portfolio folder: place one that looks like a profile photo as a circular avatar in the hero, and use any others as decorative elements in the Projects section.</pre>
 
-      <p>Cline will ask for permission before writing the file. Press <code class="inline">y</code> or <strong>Approve</strong> at each prompt.</p>
+      <p>OpenCode will ask for permission before writing the file. Press <code class="inline">y</code> or <strong>Approve</strong> at each prompt.</p>
 
-      <p>When Cline finishes, ask it to open the file so you can see it:</p>
+      <p>When OpenCode finishes, ask it to open the file so you can see it:</p>
 
 <pre class="prompt">open the index.html file in my default browser</pre>
 
-      <p>Your browser launches with your new site loaded. <strong>Keep that browser tab open for the rest of the workshop.</strong> Every time Cline changes the file, you will return to the tab and press refresh.</p>
+      <p>Your browser launches with your new site loaded. <strong>Keep that browser tab open for the rest of the workshop.</strong> Every time OpenCode changes the file, you will return to the tab and press refresh.</p>
 
       <h3>2. Fill in your content</h3>
 
-      <p>The site exists and your images are already placed, but the text is still placeholder. Replace the ALL-CAPS parts below with your real bio, projects, and publications, then paste the whole thing into Cline:</p>
+      <p>The site exists and your images are already placed, but the text is still placeholder. Replace the ALL-CAPS parts below with your real bio, projects, and publications, then paste the whole thing into OpenCode:</p>
 
 <pre class="prompt">Update index.html. Change the name in the hero to 'YOUR NAME'. Replace the tagline with 'YOUR TAGLINE'. Replace the About section with this bio: 'YOUR BIO'. For the three project cards use: 1) TITLE - DESCRIPTION, 2) TITLE - DESCRIPTION, 3) TITLE - DESCRIPTION. Publications: PUB1, PUB2, PUB3. Email: YOUR_EMAIL. GitHub: YOUR_USERNAME.</pre>
 
-      <p>Switch to your browser tab and refresh. Your real content is on the page. If Cline picked the wrong file for your profile photo, tell it: <em>"the profile photo is wrong, use [filename] instead."</em></p>
+      <p>Switch to your browser tab and refresh. Your real content is on the page. If OpenCode picked the wrong file for your profile photo, tell it: <em>"the profile photo is wrong, use [filename] instead."</em></p>
 
       <h3>3. Iterate like a designer</h3>
 
-      <p>The rest of the build is a conversation with Cline about how the site should look. Paste any of these, refresh the browser after each, then invent your own:</p>
+      <p>The rest of the build is a conversation with OpenCode about how the site should look. Paste any of these, refresh the browser after each, then invent your own:</p>
 
 <pre class="prompt">make the hero section dark mode with white text</pre>
 
@@ -655,19 +667,19 @@
 
       <h3>4. If something breaks</h3>
 
-      <p>Four fixes solve almost everything. When the site stops looking right, or Cline stops making sense, come back to this table and tell Cline the matching line.</p>
+      <p>Four fixes solve almost everything. When the site stops looking right, or OpenCode stops making sense, come back to this table and tell OpenCode the matching line.</p>
 
       <table>
         <thead>
-          <tr><th>Problem</th><th>What to tell Cline</th></tr>
+          <tr><th>Problem</th><th>What to tell OpenCode</th></tr>
         </thead>
         <tbody>
           <tr>
             <td>Something looks broken after a change</td>
-            <td><code class="inline">undo the last change to index.html</code></td>
+            <td>Type <code class="inline">/undo</code> — OpenCode reverts the last file change</td>
           </tr>
           <tr>
-            <td>Cline is confused or going in circles</td>
+            <td>OpenCode is confused or going in circles</td>
             <td><code class="inline">start over, rewrite index.html from scratch with the same sections</code></td>
           </tr>
           <tr>
@@ -676,12 +688,12 @@
           </tr>
           <tr>
             <td>Hit an OpenRouter rate limit</td>
-            <td>Quit Cline, run <code class="inline">cline auth -p openrouter -k sk-or-YOUR-KEY -m deepseek/deepseek-r1:free</code>, then start Cline again</td>
+            <td>Type <code class="inline">/models</code> inside OpenCode and pick a different free model. If the key itself is rate-limited, quit with <code class="inline">Ctrl+C</code>, run <code class="inline">opencode auth login</code>, re-select OpenRouter, paste a fresh key, then run <code class="inline">opencode</code> again</td>
           </tr>
         </tbody>
       </table>
 
-      <p>If the problem is not in this table, describe it to Cline in plain English. <em>"The hero text disappeared after I asked for dark mode, help me fix it."</em> The agent can usually debug its own output.</p>
+      <p>If the problem is not in this table, describe it to OpenCode in plain English. <em>"The hero text disappeared after I asked for dark mode, help me fix it."</em> The agent can usually debug its own output.</p>
 
 
       <h2 id="publish">Publish</h2>
@@ -690,21 +702,21 @@
 
       <h3>1. Get a GitHub Personal Access Token</h3>
 
-      <p>Cline needs permission to create a repository on your GitHub account. The cleanest way is a short-lived Personal Access Token that you paste into Cline when it asks.</p>
+      <p>OpenCode needs permission to create a repository on your GitHub account. The cleanest way is a short-lived Personal Access Token that you paste into OpenCode when it asks.</p>
 
-      <p>Go to <a href="https://github.com/settings/tokens/new">github.com/settings/tokens/new</a>. Give it a name (<em>Cline </em> is fine), set <strong>Expiration</strong> to <strong>7 days</strong>, check the <strong>repo</strong> scope at the top of the scope list, scroll to the bottom, and click <strong>Generate token</strong>. Copy the token that appears. It starts with <code class="inline">ghp_</code>. Save it in a note for the next minute. You will paste it into Cline and then never use it again.</p>
+      <p>Go to <a href="https://github.com/settings/tokens/new">github.com/settings/tokens/new</a>. Give it a name (<em>OpenCode</em> is fine), set <strong>Expiration</strong> to <strong>7 days</strong>, check the <strong>repo</strong> scope at the top of the scope list, scroll to the bottom, and click <strong>Generate token</strong>. Copy the token that appears. It starts with <code class="inline">ghp_</code>. Save it in a note for the next minute. You will paste it into OpenCode and then never use it again.</p>
 
-      <h3>2. Tell Cline to publish</h3>
+      <h3>2. Tell OpenCode to publish</h3>
 
-      <p>Back in your terminal where Cline is running, replace <code class="inline">USERNAME</code> with your GitHub username in both places and paste:</p>
+      <p>Back in your terminal where OpenCode is running, replace <code class="inline">USERNAME</code> with your GitHub username in both places and paste:</p>
 
 <pre class="prompt">Publish this folder as my personal website at USERNAME.github.io. My GitHub username is USERNAME.</pre>
 
-      <p>Cline will start working. It turns your folder into a git repository, commits your files, and asks for your GitHub Personal Access Token so it can create the new repository and push. When the token prompt appears, paste the <code class="inline">ghp_</code> token you copied a moment ago. Cline uses it once and does not save it.</p>
+      <p>OpenCode will start working. It turns your folder into a git repository, commits your files, and asks for your GitHub Personal Access Token so it can create the new repository and push. When the token prompt appears, paste the <code class="inline">ghp_</code> token you copied a moment ago. OpenCode uses it once and does not save it.</p>
 
-      <p>Approve each shell command Cline asks to run. The whole sequence takes about 30 seconds. When it finishes, Cline reports the URL of your new repository.</p>
+      <p>Approve each shell command OpenCode asks to run. The whole sequence takes about 30 seconds. When it finishes, OpenCode reports the URL of your new repository.</p>
 
-      <p>If something fails partway through, describe what you see to Cline in plain English. The agent handles its own mistakes.</p>
+      <p>If something fails partway through, describe what you see to OpenCode in plain English. The agent handles its own mistakes.</p>
 
       <h3>3. Visit your live site</h3>
 
@@ -722,10 +734,10 @@
 
       <ol class="chev">
         <li>Open a terminal and <code class="inline">cd</code> into the folder you want to work in.</li>
-        <li>Run <code class="inline">cline</code> to start the chat interface.</li>
+        <li>Run <code class="inline">opencode</code> to start the chat interface.</li>
         <li>Type or paste your request at the <code class="inline">&gt;</code> prompt. Press Enter.</li>
-        <li>Approve file changes and shell commands when Cline asks.</li>
-        <li>When you want to publish, ask Cline to re-publish the change.</li>
+        <li>Approve file changes and shell commands when OpenCode asks.</li>
+        <li>When you want to publish, ask OpenCode to re-publish the change.</li>
       </ol>
 
       <h3>Prompt patterns to know</h3>
@@ -734,7 +746,8 @@
         <li><strong>Generate:</strong> "Create X with these constraints: ..."</li>
         <li><strong>Modify:</strong> "Update X to do Y. Keep everything else the same."</li>
         <li><strong>Inspect:</strong> "Show me what X looks like now."</li>
-        <li><strong>Undo:</strong> "Undo the last change to X."</li>
+        <li><strong>Undo (slash command):</strong> <code class="inline">/undo</code> — OpenCode reverts the last file change.</li>
+        <li><strong>Switch model:</strong> <code class="inline">/models</code> — pick a different OpenRouter model inside the TUI.</li>
         <li><strong>Reset:</strong> "Start over. Rewrite X from scratch with the same sections."</li>
         <li><strong>Publish:</strong> "Re-publish this change."</li>
       </ul>
@@ -752,8 +765,9 @@
       <h3>Further reading</h3>
 
       <ul class="chev">
-        <li><a href="https://docs.cline.bot">Cline documentation</a>. Official docs, feature reference, settings.</li>
-        <li><a href="https://github.com/cline/cline">Cline on GitHub</a>. Source code, issues, community.</li>
+        <li><a href="https://opencode.ai/docs">OpenCode documentation</a>. Official docs, feature reference, settings.</li>
+        <li><a href="https://github.com/sst/opencode">OpenCode on GitHub</a>. Source code, issues, community.</li>
+        <li><a href="https://opencode.ai/docs/windows-wsl">OpenCode on Windows + WSL</a>. If you want the smoother Windows path.</li>
         <li><a href="https://openrouter.ai/collections/free-models">OpenRouter free models</a>. The live list.</li>
         <li><a href="https://docs.roocode.com">Roo Code docs</a>. The other open-source VS Code agent, worth knowing.</li>
       </ul>
